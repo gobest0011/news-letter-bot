@@ -1,0 +1,32 @@
+
+name: Daily News Letter
+
+on:
+  schedule:
+    - cron: '0 8 * * *'  # 每天 UTC 时间 8:00 执行（北京时间 16:00）
+  workflow_dispatch:  # 允许手动触发
+
+jobs:
+  send-news:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run news letter script
+        env:
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+        run: |
+          python main.py
+
+      - name: Log success
+        run: |
+          echo "✅ News letter sent successfully!"
