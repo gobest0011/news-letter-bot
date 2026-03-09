@@ -7,9 +7,16 @@ from datetime import datetime
 
 # === 配置区 ===
 RSS_SOURCES = [
-    "https://feeds.bbci.co.uk/news/rss.xml",
-    "https://www.theverge.com/rss/index.xml",
-    "https://36kr.com/feed"
+    "https://feeds.bbci.co.uk/news/rss.xml",           # 国际综合
+    "https://www.theverge.com/rss/index.xml",         # 科技流行
+    "https://36kr.com/feed",                          # 中国创业生态
+    "https://www.jiqizhixin.com/rss",                 # ✅ 机器之心：AI论文、大模型、国产算力
+    "https://www.leiphone.com/feed",                  # ✅ 雷峰网：AI落地、企业应用、投融资
+    "https://rsshub.app/zhongguoai",                  # ✅ 中国AI聚合：知乎/微信/财新关键词
+    "https://arstechnica.com/feed/",                  # ✅ Ars Technica：硬件、开源、安全深度
+    "https://rsshub.app/github/trending/python",      # ✅ GitHub Python趋势：新工具发现
+    "https://rsshub.app/arxiv/recent",                # ✅ arXiv最新论文：学术前沿
+    "https://www.anandtech.com/rss"                   # ✅ AnandTech：芯片、GPU、CPU动态
 ]
 
 EMAIL_FROM = "313413666@qq.com"
@@ -19,19 +26,39 @@ SMTP_PORT = 587
 SMTP_PASSWORD = "fljrdlvpovwwbhea"  # 请替换为应用专用密码
 
 # === 主逻辑 ===
-def fetch_news():
-    articles = []
-    for url in RSS_SOURCES:
-        feed = feedparser.parse(url)
-        for entry in feed.entries[:5]:  # 每源取前5条
-            articles.append({
-                'title': entry.title,
-                'link': entry.link,
-                'summary': entry.summary[:150] + "..." if len(entry.summary) > 150 else entry.summary,
-                'source': feed.feed.title
-            })
-    return articles
+# 科技关键词库（中英文混合，覆盖主流技术热点）
+TECH_KEYWORDS = {
+    "AI", "大模型", "生成式AI", "量子", "芯片", "GPU", "自动驾驶",
+    "机器人", "元宇宙", "Web3", "区块链", "RISC-V", "神经网络",
+    "LLM", "Transformer", "AIGC", "算力", "开源", "开源模型",
+    "大语言模型", "提示工程", "模型蒸馏", "MoE", "多模态", "推理加速"
+}
 
+def fetch_news():
+    """
+    从多个RSS源抓取新闻，仅保留包含科技关键词的内容
+    返回结构化列表：[{'title', 'link', 'summary', 'source'}, ...]
+    """
+    articles = []
+    
+    for url in RSS_SOURCES:
+        try:
+            feed = feedparser.parse(url)
+            # 若源解析失败，跳过
+            if feed.bozo:
+                continue
+                
+            for entry in feed.entries[:5]:  # 每源取前5条
+                # 清洗标题与摘要，转为大写便于关键词匹配
+                title = entry.title.strip().upper()
+                summary = (entry.summary or "").strip().upper()
+                
+                # ✅ 关键过滤：仅保留含科技关键词的条目
+                if any(kw in title or kw in summary for kw in TECH_KEYWORDS):
+                    # 截断摘要，避免过长
+                    summary_clean = entry.summary[:150] + "..." if len(entry.summary or "") > 150 else (entry.summary or "")
+                    
+                    articles
 def send_email(articles):
     msg = MIMEMultipart()
     msg['From'] = EMAIL_FROM
