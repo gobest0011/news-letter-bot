@@ -12,11 +12,11 @@ RSS_SOURCES = [
     "https://36kr.com/feed"
 ]
 
-EMAIL_FROM = "yourname@gmail.com"
-EMAIL_TO = "yourname@gmail.com"  # 可设为多个，用逗号分隔
-SMTP_SERVER = "smtp.gmail.com"
+EMAIL_FROM = "313413666@qq.com"
+EMAIL_TO = "313413666@qq.com"  # 可设为多个，用逗号分隔
+SMTP_SERVER = "smtp.qq.com"
 SMTP_PORT = 587
-SMTP_PASSWORD = "your-app-password-here"  # 请替换为应用专用密码
+SMTP_PASSWORD = "fljrdlvpovwwbhea"  # 请替换为应用专用密码
 
 # === 主逻辑 ===
 def fetch_news():
